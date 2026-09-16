@@ -12,6 +12,10 @@ A total PnL hides structure. A trader can see a profitable or losing period with
 
 The dashboard imports closed-trade history from supported exchanges, normalizes it into a common model, and calculates deterministic post-trade analytics. It presents KPIs, breakdowns, an equity curve, and Intelligence P&L views for the currently selected historical scope.
 
+![Trade Performance Dashboard overview](docs/screenshots/overview.jpg)
+
+*Overview — the selected historical scope, headline KPIs, and the start of the evidence-based analysis in the responsive dashboard.*
+
 ## What makes it different
 
 The project deliberately separates an observed historical result from a decision claim:
@@ -60,9 +64,27 @@ Confidence communicates the affected historical sample size, not statistical sig
 
 It is a visibility cue about the number of historical trades behind the displayed observation. The application does not calculate statistical significance.
 
-## Dashboard / Screenshots
+## Screenshots and demo
 
-Screenshots are intentionally not fabricated. The capture plan and anonymization rules are in [docs/screenshots/README.md](docs/screenshots/README.md). Planned assets: `docs/screenshots/overview.png`, `intelligence-pnl.png`, `result-structure.png`, `equity-and-breakdown.png`, `trades.png`, and `mobile.png`.
+The following captures show the application using an anonymized historical scope. They are evidence of the implemented dashboard views; the figures are historical observations, not forecasts or trading advice. The capture inventory and privacy checklist are in [docs/screenshots/README.md](docs/screenshots/README.md).
+
+![Intelligence P&L](docs/screenshots/intelligence-pnl.jpg)
+
+*Intelligence P&L — deterministic observations of loss-related and strength-related groups in the selected closed-trade history.*
+
+![Structure of Result](docs/screenshots/result-structure.jpg)
+
+*Structure of Result — the historical composition of net PnL, including affected-trade counts and sample-size context.*
+
+![Equity curve and performance breakdown](docs/screenshots/equity-and-breakdown.jpg)
+
+*Equity and breakdown — cumulative historical net PnL alongside a monthly performance view.*
+
+![Performance breakdown](docs/screenshots/performance-breakdown.jpg)
+
+*Performance breakdown — month-by-month, direction, and notable daily historical results.*
+
+The demo video is deliberately not committed to this repository. Its public URL remains a TODO until one is provided; see [docs/contest.md](docs/contest.md).
 
 ## Architecture
 

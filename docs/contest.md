@@ -33,7 +33,7 @@ Confidence labels communicate affected sample size: LOW for 1–4 trades, MEDIUM
 
 ## Evidence of a working product
 
-The repository contains the FastAPI application, exchange adapters, normalized trade model, analytics engine, web dashboard, and automated analytics tests. The demonstration script at [DEMONSTRATION.md](DEMONSTRATION.md) walks through implemented dashboard views and the API-backed flow. Screenshots and the required video link remain to be added after an anonymized capture.
+The repository contains the FastAPI application, exchange adapters, normalized trade model, analytics engine, web dashboard, and automated analytics tests. The demonstration script at [DEMONSTRATION.md](DEMONSTRATION.md) walks through implemented dashboard views and the API-backed flow. Five reviewed application captures are embedded in the [project README](../README.md) and listed in [screenshots/README.md](screenshots/README.md). The required public demo-video URL is still a TODO and is not claimed here.
 
 ## Role of AI and author contribution
 
