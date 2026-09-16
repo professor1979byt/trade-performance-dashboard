@@ -1,0 +1,44 @@
+services:
+  postgres:
+    restart: unless-stopped
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: trade_performance
+      POSTGRES_USER: trade
+      POSTGRES_PASSWORD: trade
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U trade -d trade_performance"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    restart: unless-stopped
+    build: .
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-postgresql+psycopg://trade:trade@postgres:5432/trade_performance}
+      BYBIT_API_KEY: ${BYBIT_API_KEY:-}
+      BYBIT_API_SECRET: ${BYBIT_API_SECRET:-}
+      BYBIT_TESTNET: ${BYBIT_TESTNET:-false}
+      BYBIT_PROXY_URL: ${BYBIT_PROXY_URL:-}
+      INITIAL_BACKFILL_DAYS: ${INITIAL_BACKFILL_DAYS:-90}
+      PIONEX_API_KEY: ${PIONEX_API_KEY:-}
+      PIONEX_API_SECRET: ${PIONEX_API_SECRET:-}
+      PIONEX_PROXY_URL: ${PIONEX_PROXY_URL:-}
+      PIONEX_ENABLED: ${PIONEX_ENABLED:-false}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    command: >
+      sh -c "alembic upgrade head &&
+             uvicorn app.main:app --host 0.0.0.0 --port 8000"
+
+volumes:
+  postgres_data:

@@ -1,0 +1,4 @@
+FROM trade-performance-app:latest
+
+COPY app /app/app
+COPY alembic /app/alembic
