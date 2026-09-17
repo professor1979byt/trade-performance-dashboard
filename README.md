@@ -121,7 +121,9 @@ FastAPI analytics endpoints → web dashboard
 
 *Performance breakdown — помесячные результаты, сравнение направлений и заметные дневные исторические результаты.*
 
-Демонстрационное видео намеренно не добавляется в Git. Публичная ссылка на него пока не предоставлена и остаётся обязательным TODO в [docs/contest.md](docs/contest.md).
+Демонстрационное видео намеренно не добавляется в Git.
+
+**Демо-видео:** https://youtu.be/2iqM09nP3TE?is=Cw5cgsTIFTExBKl5
 
 ## Ограничения
 
@@ -165,7 +167,7 @@ PFI: контекст до сделки → фактическая сделка 
 
 ## Конкурсная заявка
 
-Краткая конкурсная презентация — в [docs/contest.md](docs/contest.md). Сценарий демонстрации на 2–3 минуты находится в [docs/DEMONSTRATION.md](docs/DEMONSTRATION.md). Ссылка на обязательное demo video будет добавлена в отмеченный placeholder после записи; в этом репозитории она пока не заявляется.
+Краткая конкурсная презентация — в [docs/contest.md](docs/contest.md). Сценарий демонстрации на 2–3 минуты находится в [docs/DEMONSTRATION.md](docs/DEMONSTRATION.md). Демо-видео: https://youtu.be/2iqM09nP3TE?is=Cw5cgsTIFTExBKl5
 
 ## Лицензия / повторное использование
 
