@@ -1,186 +1,172 @@
 # Trade Performance Dashboard
 
-> Evidence-based post-trade analytics for real trading history.
+> Evidence-based post-trade analytics for real trading history
 
-Trade Performance Dashboard is a web dashboard for examining the result of closed trades after they happened. It is not a trading bot and not just a PnL tracker: alongside “how much was earned or lost?”, it asks which groups of historical trades made up that result.
+Trade Performance Dashboard — веб-панель для разбора уже закрытых сделок. Это не торговый бот и не просто PnL tracker: сервис показывает не только, сколько было заработано или потеряно, но и какие группы исторических сделок сформировали итоговый результат.
 
-## Problem
+## Что это
 
-A total PnL hides structure. A trader can see a profitable or losing period without seeing how directions, instruments, exchanges, fees, liquidations, or a small number of large losses contributed to it. Turning that hidden structure into a trading instruction would be equally misleading when the historical record lacks entry context.
+Это evidence-based слой персональной post-trade аналитики. Он работает с фактической историей закрытых сделок, приводит данные поддерживаемых бирж к единой модели и помогает исследовать результат выбранного периода: по направлениям, инструментам, биржам, комиссиям, ликвидациям и другим срезам.
 
-## Solution
+## Проблема
 
-The dashboard imports closed-trade history from supported exchanges, normalizes it into a common model, and calculates deterministic post-trade analytics. It presents KPIs, breakdowns, an equity curve, and Intelligence P&L views for the currently selected historical scope.
+Общий PnL скрывает структуру результата. Прибыльный или убыточный период сам по себе не объясняет, как на него повлияли LONG и SHORT, отдельные монеты, биржи, комиссии, ликвидации или несколько крупных убытков. Но превращать такие наблюдения в торговые указания было бы столь же неверно: в истории сделок обычно нет полного контекста на момент входа.
 
-![Trade Performance Dashboard overview](docs/screenshots/overview.jpg)
+## Решение
 
-*Overview — the selected historical scope, headline KPIs, and the start of the evidence-based analysis in the responsive dashboard.*
+Dashboard импортирует историю закрытых сделок с поддерживаемых бирж, нормализует её в общую модель и рассчитывает детерминированную post-trade аналитику. Для выбранного исторического среза доступны KPI, разбивки, кривая доходности, Intelligence P&L и «Структура результата».
 
-## What makes it different
+![Обзор Trade Performance Dashboard](docs/screenshots/overview.jpg)
 
-The project deliberately separates an observed historical result from a decision claim:
+*Обзор — выбранный исторический срез, ключевые KPI и начало evidence-based анализа в адаптивном интерфейсе.*
 
-1. **Fact** — for example, the selected history’s LONG trades produced a stated net PnL.
-2. **Counterfactual historical scenario** — the same history is recalculated as if a specified group of its closed trades were absent.
-3. **Causal or decision interpretation** — a claim about whether a trader should take, avoid, or change a decision.
+## Что умеет
 
-The current version implements the first two. It does **not** claim the third. Market state, entry thesis, signal, risk plan, exit conditions, and market regime are not available as complete pre-trade context. Historical correlation is therefore not a trading recommendation.
+- Работает с историей закрытых сделок Bybit и Pionex.
+- Показывает число сделок, Win rate, валовый и чистый PnL, комиссии, Profit factor, средний выигрыш/убыток и метрики ликвидаций.
+- Показывает последний доступный снимок equity и ROI, если для биржи доступен снимок баланса.
+- Поддерживает пресеты периода, произвольный диапазон дат и фильтры по бирже; в списке сделок — также по символу и категории.
+- Выявляет наблюдения «Где я теряю деньги» и «Что у меня работает» для выбранной истории.
+- Строит исторические сценарии по ликвидациям, направлению, бирже, группе монет, концентрации убытков и комиссиям — когда для этого есть данные.
+- Показывает кривую доходности и разбивки по дням, месяцам, годам, направлениям и монетам.
+- Имеет адаптивный web-интерфейс и HTTP API для тех же данных.
 
-## Key Features
+## Интеллект P&L
 
-- Closed-trade model for Bybit and Pionex history.
-- KPI view: trade count, win rate, gross and net PnL, commissions, profit factor, average win/loss, and liquidation metrics.
-- Latest equity snapshot and ROI where an applicable exchange balance snapshot exists.
-- Period presets, custom date range, and exchange filters; symbol and category filters in the trades view.
-- Intelligence P&L: “Where I lose money” and “What works for me” observations for the selected history.
-- Structure of Result: historical scenarios for liquidations, direction, exchange, coin group, loss concentration, and fees when the relevant conditions are present.
-- Equity curve plus daily, monthly, yearly, direction, and coin breakdowns.
-- Responsive dashboard layout, including mobile-oriented cards and controls.
-- HTTP analytics API for the same data used by the dashboard.
+Для выбранных периода и бирж движок агрегирует нормализованные закрытые сделки по таким измерениям, как направление, биржа и символ. Так формируются детерминированные наблюдения о группах, связанных с убытками и сильными результатами.
 
-## How Intelligence P&L works
+Здесь нет runtime LLM analytics: цифры и выводимые наблюдения рассчитываются по сохранённым историческим полям. Генеративная модель не интерпретирует числа и не создаёт торговые советы.
 
-For a selected period and exchange scope, the analytics engine aggregates normalized closed trades. It computes the result by dimensions such as direction, exchange, and symbol, then exposes deterministic observations about losses and strengths. The Structure of Result endpoint additionally builds eligible historical scenarios, ordered by their calculated historical difference.
+## Структура результата
 
-The calculations operate on stored historical trade fields; they do not use a generative model to interpret numbers or create advice.
+«Структура результата» помогает отделить три разных уровня утверждений:
 
-## Fact vs Counterfactual vs Causality
+1. **FACT** — наблюдаемый исторический результат. Например: LONG-сделки в выбранной истории дали определённый чистый PnL.
+2. **COUNTERFACTUAL HISTORICAL SCENARIO** — пересчёт той же истории так, как если бы выбранной группы уже закрытых сделок в ней не было.
+3. **CAUSAL / DECISION INTERPRETATION** — вывод о том, стоило ли совершать, избегать или менять решение.
 
-**Actual historical net PnL** is the recorded net result for the selected scope.
+Текущая версия реализует первые два уровня и не делает третий. Для него не хватает полного контекста до входа в сделку: состояния рынка, исходной гипотезы, сигнала, риск-плана, условий выхода и рыночного режима. Поэтому историческая связь не является торговой рекомендацией.
 
-**Hypothetical historical net PnL** is a descriptive recalculation of that same scope without a specified group of closed trades. The displayed difference is the arithmetic change between those two historical totals.
+**Фактический исторический чистый PnL** — зарегистрированный чистый результат выбранного среза.
 
-This counterfactual is **not** a forecast, signal, trading recommendation, or proof of causality. For example, a negative historical result for a direction does not mean “do not trade that direction.” It only identifies a group worth examining with information that the current data model does not fully contain.
+**Гипотетический исторический чистый PnL** — описательный пересчёт этого же среза без заданной группы закрытых сделок. Разница — это арифметическое изменение двух исторических итогов, а не прогноз.
 
-### Confidence labels
+### Уровни Confidence
 
-Confidence communicates the affected historical sample size, not statistical significance:
+Confidence отражает только размер затронутой исторической выборки, а не статистическую значимость:
 
-| Confidence | Affected closed trades |
+| Confidence | Затронутые закрытые сделки |
 | --- | ---: |
 | LOW | 1–4 |
 | MEDIUM | 5–19 |
 | HIGH | 20+ |
 
-It is a visibility cue about the number of historical trades behind the displayed observation. The application does not calculate statistical significance.
+Это ориентир по числу сделок, стоящих за наблюдением. Статистическая значимость в приложении не рассчитывается.
 
-## Screenshots and demo
+## Кривая доходности и Performance breakdown
 
-The following captures show the application using an anonymized historical scope. They are evidence of the implemented dashboard views; the figures are historical observations, not forecasts or trading advice. The capture inventory and privacy checklist are in [docs/screenshots/README.md](docs/screenshots/README.md).
+Кривая доходности показывает накопительный исторический чистый PnL. Performance breakdown дополняет её разбивками по месяцам, годам, дням, направлениям и монетам, чтобы общий итог можно было изучать в разных срезах.
 
-![Intelligence P&L](docs/screenshots/intelligence-pnl.jpg)
+## Поддерживаемые биржи
 
-*Intelligence P&L — deterministic observations of loss-related and strength-related groups in the selected closed-trade history.*
+- **Bybit:** импорт закрытого PnL и снимка баланса аккаунта.
+- **Pionex:** импорт истории позиций; при доступности используются данные исполнений и funding для обогащения записей, а также снимок баланса.
 
-![Structure of Result](docs/screenshots/result-structure.jpg)
+Клиенты бирж используют операции чтения поддерживаемой истории и баланса. В приложении нет логики размещения или отмены ордеров. История нормализуется и сохраняется в базе приложения, но сделки не исполняются.
 
-*Structure of Result — the historical composition of net PnL, including affected-trade counts and sample-size context.*
-
-![Equity curve and performance breakdown](docs/screenshots/equity-and-breakdown.jpg)
-
-*Equity and breakdown — cumulative historical net PnL alongside a monthly performance view.*
-
-![Performance breakdown](docs/screenshots/performance-breakdown.jpg)
-
-*Performance breakdown — month-by-month, direction, and notable daily historical results.*
-
-The demo video is deliberately not committed to this repository. Its public URL remains a TODO until one is provided; see [docs/contest.md](docs/contest.md).
-
-## Architecture
+## Как это работает
 
 ```text
 Bybit / Pionex
        |
        v
-Import adapters and sync services
+Адаптеры импорта и сервисы синхронизации
        |
        v
-Normalization into closed-trade records
+Нормализация в записи закрытых сделок
        |
        v
 PostgreSQL
        |
        v
-Analytics engine
-  ├─ KPI and breakdowns
+Движок аналитики
+  ├─ KPI и разбивки
   ├─ Intelligence P&L
   ├─ counterfactual historical scenarios
-  └─ equity curve
+  └─ кривая доходности
        |
        v
 FastAPI analytics endpoints → web dashboard
 ```
 
-See [docs/architecture.md](docs/architecture.md) for the compact technical description and the explicitly future-only PFI concept.
+Краткое техническое описание доступно в [docs/architecture.md](docs/architecture.md).
 
-## Data Sources
+## Скриншоты / Демонстрация
 
-- **Bybit:** closed PnL and account-balance snapshot integration.
-- **Pionex:** history-position import, with fills and funding data used as enrichment where available, plus a balance snapshot integration.
+Ниже — пять снимков приложения на анонимизированном историческом срезе. Это подтверждение реализованных экранов, а не прогнозы и не торговые рекомендации. Состав снимков и checklist приватности — в [docs/screenshots/README.md](docs/screenshots/README.md).
 
-The exchange client implementations use read operations for the supported history and balance data; the application contains no exchange order-placement or cancellation flow. Use credentials with the minimum available read-only permissions. Importing history writes normalized records to the application database; it does not execute trades.
+![Intelligence P&L](docs/screenshots/intelligence-pnl.jpg)
 
-## Analytics API
+*Intelligence P&L — детерминированные наблюдения о связанных с убытками группах и сильных результатах в выбранной истории закрытых сделок.*
 
-Implemented read endpoints include:
+![Структура результата](docs/screenshots/result-structure.jpg)
 
-- `GET /health`
-- `GET /analytics/overview`
-- `GET /analytics/insights`
-- `GET /analytics/recommendations`
-- `GET /analytics/equity-curve`
-- `GET /analytics/daily`
-- `GET /analytics/directions`
-- `GET /analytics/coins`
-- `GET /analytics/monthly`
-- `GET /analytics/yearly`
-- `GET /trades`
+*Структура результата — исторический состав чистого PnL, включая число затронутых сделок и контекст размера выборки.*
 
-The scope-aware endpoints accept period/date and exchange filtering as implemented by the API; the trade list also supports symbol and category filtering. See the route definitions in `app/main.py` for exact query parameters.
+![Кривая доходности и разбивка](docs/screenshots/equity-and-breakdown.jpg)
 
-## Mobile UX
+*Кривая доходности и разбивка — накопительный исторический чистый PnL и помесячная динамика.*
 
-The single-page dashboard has a responsive layout: summary metrics, analytics cards, breakdowns, and trades adapt to a compact card-oriented presentation for smaller screens. The planned mobile capture is documented in the screenshot guide.
+![Performance breakdown](docs/screenshots/performance-breakdown.jpg)
 
-## Reliability / Tests
+*Performance breakdown — помесячные результаты, сравнение направлений и заметные дневные исторические результаты.*
 
-The repository contains automated tests for analytics overview, insights, and counterfactual/result-structure calculations in `tests/`. The test suite exercises calculation behavior, filters, confidence thresholds, deterministic ordering, and safeguards against directive trading language. This is test coverage of the analytics layer, not a claim of a production service-level guarantee.
+Демонстрационное видео намеренно не добавляется в Git. Публичная ссылка на него пока не предоставлена и остаётся обязательным TODO в [docs/contest.md](docs/contest.md).
 
-## AI-assisted development
+## Ограничения
 
-AI/Codex was used as an engineering assistant for work such as analysis of the existing project, development, refactoring, logic review, testing, UI/UX improvements, and documentation preparation. It is not a runtime analyst in the product.
+- Это post-trade аналитика, а не полная запись контекста принятия решения до сделки.
+- Историческая связь не доказывает причинность.
+- Counterfactual historical scenario не является прогнозом или торговым сигналом.
+- Уровни Confidence — это диапазоны размера выборки, а не статистическая значимость.
+- Записи Pionex пропускаются, если по исходным данным нельзя получить явное направление, ненулевой размер или пригодные цены входа и выхода.
 
-The runtime analytics layer is deliberately deterministic and evidence-based: displayed figures and historical scenarios are calculated from stored trade data rather than delegated to a generative model that could invent a conclusion.
+Подробности — в [docs/LIMITATIONS.md](docs/LIMITATIONS.md).
 
-## Limitations
+## Роль AI в разработке
 
-- This is post-trade analytics, not a complete pre-trade decision record.
-- Historical association does not establish causality.
-- A counterfactual historical scenario is not a forecast or trading signal.
-- Confidence labels are sample-size bands, not statistical significance.
-- Pionex records can be skipped when a usable explicit direction, size, or entry/exit price cannot be derived from available source data.
+AI/Codex использовался как инженерный помощник при анализе проекта, разработке, рефакторинге, проверке логики, тестировании, улучшении UI/UX и подготовке документации.
 
-See [docs/LIMITATIONS.md](docs/LIMITATIONS.md) for details.
+Runtime-аналитика проекта детерминированная и evidence-based: отображаемые показатели и исторические сценарии вычисляются по сохранённым данным сделок, а не поручаются генеративной модели.
 
-## Roadmap
+## Безопасность
 
-**Future development only — PFI is not implemented or integrated.** A possible next stage is to connect pre-trade context to the post-trade record:
+Храните учётные данные вне репозитория и выдавайте API-ключам бирж только минимально необходимые права чтения. Не публикуйте идентификаторы аккаунтов, сделок и ордеров, сырые ответы API, ключи, токены, cookies или инфраструктурную конфигурацию в скриншотах и демонстрациях. Подробнее — в [SECURITY.md](SECURITY.md).
+
+## Запуск
+
+1. Создайте локальный файл окружения: `cp .env.example .env`.
+2. При необходимости заполните в `.env` API-ключи бирж с правами только на чтение.
+3. Запустите приложение и PostgreSQL: `docker compose up --build`.
+4. После запуска откройте `http://localhost:8000`.
+
+Контейнер приложения применяет миграции базы данных при старте. Для быстрой проверки доступны, в частности, `GET /health` и аналитические endpoints; точные параметры маршрутов описаны в `app/main.py`.
+
+## Дальнейшее развитие
+
+**Только возможное будущее развитие: PFI не реализован и не интегрирован.** Следующим этапом мог бы стать контекст до сделки:
 
 ```text
-PFI pre-trade context → actual trade → Trade Performance Dashboard
-→ post-trade result analysis → comparison of initial thesis and outcome
+PFI: контекст до сделки → фактическая сделка → Trade Performance Dashboard
+→ post-trade анализ результата → сопоставление исходной гипотезы и исхода
 ```
 
-Potential PFI context includes market regime, funding/open interest, order flow, liquidity, manipulation risk, signal/evidence, and other pre-trade market factors. Only with that context could the project progress toward fuller Decision Intelligence.
+Такой контекст мог бы включать рыночный режим, funding/open interest, order flow, ликвидность, риск манипуляций, сигнал или доказательства для гипотезы и другие факторы до сделки. Только с ним проект мог бы двигаться к более полному Decision Intelligence.
 
-## Security & Privacy
+## Конкурсная заявка
 
-Keep credentials outside the repository and use least-privilege exchange access. Do not publish account identifiers, trade identifiers, raw exchange payloads, or infrastructure configuration in screenshots or demos. See [SECURITY.md](SECURITY.md).
+Краткая конкурсная презентация — в [docs/contest.md](docs/contest.md). Сценарий демонстрации на 2–3 минуты находится в [docs/DEMONSTRATION.md](docs/DEMONSTRATION.md). Ссылка на обязательное demo video будет добавлена в отмеченный placeholder после записи; в этом репозитории она пока не заявляется.
 
-## Contest / Demo
+## Лицензия / повторное использование
 
-The concise contest entry is in [docs/contest.md](docs/contest.md). A 2–3 minute walkthrough script is in [docs/DEMONSTRATION.md](docs/DEMONSTRATION.md). A required demo-video link can be added to the marked placeholder after recording; no video link is claimed here.
-
-## License / reuse
-
-No `LICENSE` file is present in this repository at this revision. No open-source license or reuse permission is asserted by this README.
+В текущей версии репозитория отсутствует файл `LICENSE`. Этот README не заявляет open-source лицензию или разрешение на повторное использование.

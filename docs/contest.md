@@ -1,50 +1,62 @@
-# Contest Entry — Trade Performance Dashboard
+# Конкурсная заявка — Trade Performance Dashboard
 
-**Working title:** Trade Performance Dashboard
-**Subtitle:** Evidence-based post-trade analytics for real trading history
-**Demo video:** _[add required public demo-video link after recording]_
+**Рабочее название:** Trade Performance Dashboard
 
-## Problem
+**Подзаголовок:** Evidence-based post-trade analytics for real trading history
 
-Ordinary PnL tracking answers how much a trader earned or lost. It does not make the structure of that historical result easy to inspect: which trade groups, fees, liquidations, directions, exchanges, or instruments contributed to it.
+**Демонстрационное видео:** _[добавить обязательную публичную ссылку на demo video после записи]_
 
-## Solution
+## Что это
 
-Trade Performance Dashboard imports supported closed-trade history, normalizes it into a common database model, and presents deterministic post-trade analytics in a responsive web dashboard. The product combines KPI, breakdowns, equity curve, and Intelligence P&L views for a selected historical period.
+Trade Performance Dashboard — evidence-based слой персональной post-trade аналитики для истории реальных закрытых сделок. Это не торговый бот и не просто PnL tracker: продукт отвечает не только на вопрос «сколько заработано или потеряно?», но и показывает, какие группы исторических сделок сформировали результат.
 
-## What is implemented
+## Проблема
 
-- Bybit and Pionex history integrations.
-- Closed-trade records and PostgreSQL-backed analytics.
-- Trade count, win rate, gross/net PnL, fees, profit factor, average win/loss, liquidation metrics, and ROI where an equity snapshot is available.
-- Date, period, exchange, symbol, and category filtering in the relevant views.
-- Intelligence P&L sections: “Where I lose money” and “What works for me.”
-- Structure of Result with historical scenarios and counterfactual calculations.
-- Equity curve and monthly, yearly, daily, direction, and coin breakdowns.
-- Responsive web dashboard and analytics API.
+Обычный учёт PnL показывает общий итог, но не позволяет быстро увидеть его структуру: вклад направлений, инструментов, бирж, комиссий, ликвидаций и конкретных групп сделок. При этом исторический результат нельзя честно превращать в торговую инструкцию, если не известен полный контекст до входа в сделку.
 
-## Result and differentiation
+## Решение
 
-The dashboard goes beyond a total PnL number by asking: “Which groups of historical closed trades made up this result?” It can show the actual historical net PnL and a hypothetical historical net PnL without a selected group of those already closed trades.
+Trade Performance Dashboard импортирует историю закрытых сделок с поддерживаемых бирж, нормализует её в общую модель PostgreSQL и выводит детерминированную post-trade аналитику в адаптивной web-панели. Для выбранного исторического периода продукт объединяет KPI, разбивки, кривую доходности и Intelligence P&L.
 
-That is descriptive, not prescriptive. A negative result for a group is a fact about the selected history, not a recommendation to stop trading that group. The product explicitly separates fact, counterfactual historical scenario, and causal/decision interpretation. The last of these is not claimed by the current version.
+## Что реализовано
 
-Confidence labels communicate affected sample size: LOW for 1–4 trades, MEDIUM for 5–19, and HIGH for 20+. They are not statistical-significance claims.
+- Интеграции истории Bybit и Pionex.
+- Нормализованные записи закрытых сделок и аналитика на PostgreSQL.
+- Число сделок, Win rate, валовый/чистый PnL, комиссии, Profit factor, средний выигрыш/убыток, метрики ликвидаций и ROI при наличии снимка equity.
+- Фильтрация по периоду, датам, бирже, символу и категории в соответствующих экранах.
+- Разделы Intelligence P&L: «Где я теряю деньги» и «Что у меня работает».
+- «Структура результата» с историческими сценариями и counterfactual-расчётами.
+- Кривая доходности и разбивки по месяцам, годам, дням, направлениям и монетам.
+- Адаптивная web-панель и analytics API.
 
-## Evidence of a working product
+## В чём отличие и как интерпретировать результат
 
-The repository contains the FastAPI application, exchange adapters, normalized trade model, analytics engine, web dashboard, and automated analytics tests. The demonstration script at [DEMONSTRATION.md](DEMONSTRATION.md) walks through implemented dashboard views and the API-backed flow. Five reviewed application captures are embedded in the [project README](../README.md) and listed in [screenshots/README.md](screenshots/README.md). The required public demo-video URL is still a TODO and is not claimed here.
+Dashboard идёт дальше одной итоговой цифры PnL и задаёт вопрос: «Какие группы исторических закрытых сделок сформировали этот результат?» Он показывает фактический исторический чистый PnL и может пересчитать ту же историю так, как если бы выбранной группы уже закрытых сделок в ней не было.
 
-## Role of AI and author contribution
+Важно различать три уровня:
 
-The author built the product’s application flow, integrations, normalization, analytics, dashboard, and supporting tests/documentation. AI/Codex served as an engineering assistant for analysis, development, refactoring, logic review, testing, UI/UX improvement, and documentation work.
+1. **FACT** — наблюдаемый исторический результат.
+2. **COUNTERFACTUAL HISTORICAL SCENARIO** — расчёт того, каким был бы исторический результат без выбранной группы сделок.
+3. **CAUSAL / DECISION INTERPRETATION** — вывод о причинах результата или о том, какое торговое решение следует принять.
 
-There is no claimed runtime LLM analysis. Runtime figures and historical scenarios are deterministic calculations over stored trade data.
+Текущая версия реализует первые два уровня и не заявляет третий. Отрицательный результат группы — это факт о выбранной истории, а не рекомендация прекратить торговать эту группу. В данных нет полного pre-trade контекста: рыночного режима, исходной гипотезы, сигнала, риск-плана и условий выхода. Историческая связь не доказывает причинность и не является торговым советом.
 
-## Limitations
+Уровни Confidence показывают только размер затронутой выборки: LOW — 1–4 сделки, MEDIUM — 5–19, HIGH — 20+. Это не статистическая значимость.
 
-This is post-trade analytics. It does not contain complete pre-trade context such as market regime, entry thesis, signal, risk plan, or exit conditions. Historical correlation is not causality, and counterfactual history is not a forecast. See [LIMITATIONS.md](LIMITATIONS.md).
+## Подтверждение работающего продукта
 
-## Further development
+В репозитории находятся FastAPI-приложение, адаптеры бирж, нормализованная модель сделок, движок аналитики, web-панель и автоматические тесты аналитики. [Сценарий демонстрации](DEMONSTRATION.md) проводит по реализованным экранам панели и потоку данных через API. Пять проверенных снимков приложения встроены в [основной README](../README.md) и перечислены в [screenshots/README.md](screenshots/README.md). Обязательная публичная ссылка на demo video пока остаётся TODO и здесь не заявляется.
 
-**Future only:** PFI could provide pre-trade market context before an actual trade is analyzed by the dashboard. This could later support comparison of the initial thesis with the outcome and more complete Decision Intelligence. PFI is not part of the current implementation.
+## Роль AI и вклад автора
+
+Автор реализовал пользовательский сценарий, интеграции, нормализацию, аналитику, панель и поддерживающие тесты/документацию. AI/Codex использовался как инженерный помощник при анализе, разработке, рефакторинге, проверке логики, тестировании, улучшении UI/UX и подготовке документации.
+
+Runtime LLM analytics в продукте не заявляется. Показатели и исторические сценарии в runtime детерминированно рассчитываются на сохранённых данных сделок.
+
+## Ограничения
+
+Это post-trade аналитика, а не полная система фиксации контекста решения до сделки. Историческая корреляция не означает причинность, а counterfactual historical scenario не является прогнозом. Подробнее — в [LIMITATIONS.md](LIMITATIONS.md).
+
+## Дальнейшее развитие
+
+**Только возможное будущее развитие:** PFI мог бы дать контекст рынка до фактической сделки, чтобы позднее сопоставлять исходную гипотезу с результатом и двигаться к более полному Decision Intelligence. PFI не входит в текущую реализацию.
